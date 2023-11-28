@@ -6,6 +6,7 @@ PROJECT(server)
 
 SET(source
     server/server.c
+    helper/cmd_parser.c
 )
 
 
