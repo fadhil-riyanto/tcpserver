@@ -23,7 +23,7 @@ void tcpfd_set_prop(struct tcp_structure *tcp_structure, char *addr, int listenp
 
     tcp_structure->sockaddr_in.sin_family = AF_INET;
     tcp_structure->sockaddr_in.sin_port = htons(listenport);
-    tcp_structure->sockaddr_in.sin_addr.s_addr = inet_addr("127.0.0.1");
+    tcp_structure->sockaddr_in.sin_addr.s_addr = inet_addr(addr);
 }
 
 
