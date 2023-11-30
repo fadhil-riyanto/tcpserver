@@ -16,6 +16,11 @@ int epoll_init(struct epoll_prop *epoll_prop)
 
 int epoll_set_watch(struct epoll_prop *epoll_prop, uint32_t epoll_event_type, int fd)
 {
+    struct epoll_event events[100];
+    epoll_prop->events = events;
+
+    struct epoll_event event;
+    epoll_prop->epoll_event = &event;
     epoll_prop->epoll_event->events = EPOLLIN;
     epoll_prop->epoll_event->data.fd = fd;
 

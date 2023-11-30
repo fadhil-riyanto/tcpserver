@@ -2,12 +2,14 @@
 #define _EPOLLFN_H_
 
 #include <stdint.h>
+#include "../../config.c"
 
 struct epoll_prop
 {
     int fd; // fd to watch
     int epfd;
     struct epoll_event *epoll_event;
+    struct epoll_event *events;
 };
 
 int epoll_init(struct epoll_prop *epoll_prop);
