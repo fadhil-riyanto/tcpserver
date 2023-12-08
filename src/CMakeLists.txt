@@ -6,7 +6,9 @@ PROJECT(server)
 
 SET(source
     server/server.c
+    server/daemon.c
     helper/cmd_parser.c
+    helper/epollfn.c
 )
 
 

@@ -11,7 +11,7 @@
 
 void tcpfd_create(struct tcp_structure *tcp_structure)
 {
-    tcp_structure->tcpfd = socket(AF_INET, SOCK_STREAM, 0);
+    tcp_structure->tcpfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
     if (tcp_structure->tcpfd < 0) {
         perror("socket");
     }
@@ -38,5 +38,5 @@ void tcpfd_bind_and_listen(struct tcp_structure *tcp_structure)
         close(tcp_structure->tcpfd);
     }
 
-    ret = listen(tcp_structure->tcpfd, TCP_MAX_CONN);
+    ret = listen(tcp_structure->tcpfd, _CONFIG_TCP_MAX_CONN);
 }

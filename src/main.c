@@ -1,4 +1,6 @@
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "helper/header/cmd_parser.h"
 #include "server/server.h"
 #include "server/daemon.h"
@@ -22,7 +24,8 @@ void _main(struct cmd_prop *cmd_prop)
     tcpfd_create(&tcp_structure);
     tcpfd_set_prop(&tcp_structure, cmd_prop->server_addr, cmd_prop->port);
     tcpfd_bind_and_listen(&tcp_structure);
-    
+    // printf("%d", errno);
+    // exit(1);
     start_daemon(&tcp_structure);
 }
 
