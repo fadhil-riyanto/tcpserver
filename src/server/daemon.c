@@ -15,6 +15,29 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <signal.h>
+
+int volatile signal_status = 0;
+
+struct container_data2thread
+{
+    int 
+    struct multithreading_struct *multithreading_struct; // for cleaning session utils
+}
+
+
+void signal_handler(int revc_signum)
+{
+    signal_status = revc_signum;
+}
+/*
+ * signum: watching signal
+ * 
+ */
+void setup_signal(int signum)
+{
+    signal(signum, signal_handler);
+}
 
 // struct thread_data_joiner
 
@@ -22,9 +45,8 @@ void init_child_workers(struct multithreading_struct *multithreading_struct)
 {
     for(int i = 0; i < _CONFIG_TCP_MAX_CONN; i++)
     {
-        multithreading_struct[i].unique_fd_num = 0;
-        multithreading_struct[i].state = 0;
-        multithreading_struct[i].ready_to_be_use = 0x1; 
+        multithreading_struct[i].state = DEAD;
+        multithreading_struct[i].ready_to_be_use = YES; 
     }
 }
 
@@ -32,18 +54,22 @@ int rand_thread_get_free_num(struct multithreading_struct *multithreading_struct
 {
     for(int i = 0; i < _CONFIG_TCP_MAX_CONN; i++)
     {
-        if (multithreading_struct[i].state == 0x0 && multithreading_struct[i].ready_to_be_use == 0x1)
+        if (multithreading_struct[i].state == DEAD && multithreading_struct[i].ready_to_be_use == NO)
         {
+            // DO CLEANING
             return i;
         }
     }
     return -1; // no enough space
 }
 
-// void *thread_runner(void *data)
-// {
+// note
+// needed: fd (reply)
+//           
+void *thread_runner(void *data)
+{
 
-// }
+}
 
 int make_child(struct multithreading_struct *multithreading_struct, 
         struct epoll_prop *epoll_prop, int fd_num_unique)
@@ -68,17 +94,20 @@ int make_child(struct multithreading_struct *multithreading_struct,
         printf("recvfrom %d", free_num);
         close(accept_ret);
     } else {
-        multithreading_struct[free_num].state = 0x1;
-        multithreading_struct[free_num].ready_to_be_use = 0x0;
-        
         socklen = sizeof(sockaddr_in);
         accept_ret = accept(epoll_prop->events[fd_num_unique].data.fd, (struct sockaddr*)&sockaddr_in, &socklen);
-        
-        char tempbuf[5] = "hai\n";
-        write(accept_ret, tempbuf, sizeof(tempbuf));
 
-        printf("recvfrom %d", free_num);
-        close(accept_ret);
+        // insert
+        multithreading_struct[free_num].state = ALIVE;
+        multithreading_struct[free_num].ready_to_be_use = NO;
+        multithreading_struct[free_num].unique_fd_num = 
+        pthread_create(pthread_t *restrict newthread, const pthread_attr_t *restrict attr, void *(*start_routine)(void *), void *restrict arg)
+        
+        // char tempbuf[5] = "hai\n";
+        // write(accept_ret, tempbuf, sizeof(tempbuf));
+
+        // printf("recvfrom %d", free_num);
+        // close(accept_ret);
     }
 
 
@@ -91,6 +120,9 @@ int make_child(struct multithreading_struct *multithreading_struct,
 
 int start_daemon(struct tcp_structure *tcp_structure)
 {
+    // set signal
+    setup_signal(SIGINT);
+
     int ret, read_ret, parent_accept_fd, fd_ready_by_epoll = 0;
     char buf[4096];
     int resultread;
@@ -116,24 +148,24 @@ int start_daemon(struct tcp_structure *tcp_structure)
         fd_ready_by_epoll = epoll_wait(epoll_prop.epfd, epoll_prop.events, _CONFIG_TCP_MAX_CONN, -1);
         printf("%d nums %d\n", fd_ready_by_epoll, errno);
         // break;
-        // for (int i = 0; i < fd_ready_by_epoll; i++) {
-        //     // printf("data is 0x%X04 \n", epoll_prop.events[i].events);
-        //     // //printf("eventnum %d\n", epoll_prop.events[i].events);
+        for (int i = 0; i < fd_ready_by_epoll; i++) {
+            // printf("data is 0x%X04 \n", epoll_prop.events[i].events);
+            // //printf("eventnum %d\n", epoll_prop.events[i].events);
 
-        //     if ((epoll_prop.events[i].events & EPOLLERR) || 
-        //         (epoll_prop.events[i].events & EPOLLHUP) || 
-        //         !(epoll_prop.events[i].events & EPOLLIN)) 
-        //     {
-        //         close(epoll_prop.events[i].data.fd);
-        //     } else {
-        //         printf("new conn detected by epollnums %d with fd is %d status %x, fdtotal ret %d \n", i, epoll_prop.events[i].data.fd, epoll_prop.events[i].events, fd_ready_by_epoll);
-        //         //make_child(multithreading_struct, &epoll_prop, i);
-        //         // ret = accept(epoll_prop.events[i].data.fd, (struct sockaddr*)&incoming_connection, &addrlen);
-        //         // sleep(2);
-        //         // close(ret);
+            if ((epoll_prop.events[i].events & EPOLLERR) || 
+                (epoll_prop.events[i].events & EPOLLHUP) || 
+                !(epoll_prop.events[i].events & EPOLLIN)) 
+            {
+                close(epoll_prop.events[i].data.fd);
+            } else {
+                printf("new conn detected by epollnums %d with fd is %d status %x, fdtotal ret %d \n", i, epoll_prop.events[i].data.fd, epoll_prop.events[i].events, fd_ready_by_epoll);
+                make_child(multithreading_struct, &epoll_prop, i);
+                // ret = accept(epoll_prop.events[i].data.fd, (struct sockaddr*)&incoming_connection, &addrlen);
+                // sleep(2);
+                // close(ret);
 
-        //     }
-        // }
+            }
+        }
 
         
     }
