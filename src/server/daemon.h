@@ -29,7 +29,7 @@ struct multithreading_struct // will be copied into each connection, and making 
     struct sockaddr_in sockaddr_in;
 
     // pthread
-    pthread_t *thread_addr;
+    pthread_t thread_addr;
 
     // get timestamp
     time_t timestamp;
