@@ -2,8 +2,6 @@
 #include "../helper/header/epollfn.h"
 #include "server.h"
 #include "handler/header/main_handler_recv.h"
-
-#include <bits/pthreadtypes.h>
 #include <errno.h>
 #include <string.h>
 #include <strings.h>
@@ -19,6 +17,7 @@
 #include <stdint.h>
 #include <pthread.h>
 #include <signal.h>
+#include "../helper/header/test_function.h"
 
 int volatile signal_status = 0;
 int volatile highest_thread_nums = 0;
@@ -44,11 +43,6 @@ void setup_signal(int signum)
     signal(signum, signal_handler);
 }
 
-
-void doing_cleaning()
-{
-
-}
 
 void init_child_workers(struct multithreading_struct *multithreading_struct)
 {
@@ -87,16 +81,35 @@ void *thread_runner(void *data)
     //printf("making threadd wkwkw\n");
     
     // int accept_ret;
-    char buf[100];
+    char buf[8192];
     // struct sockaddr_in sockaddr_in;
     // socklen_t socklen;
     // socklen = sizeof(sockaddr_in);
     // accept_ret = accept(container_data2thread->tcp_structure->tcpfd, (struct sockaddr*)&sockaddr_in, &socklen);
     
     read(container_data2thread->multithreading_struct[free_num].fd_from_accept, buf, sizeof(buf));
-    printf("buf res %s\n", buf);
-    write(container_data2thread->multithreading_struct[free_num].fd_from_accept, buf, strlen(buf));
+
+    //printf("%s\n", buf);
+    // check_line_ending(buf);
+    char tempbuf[16384];
+    snprintf(tempbuf, sizeof(tempbuf), "HTTP/1.1 200\r\n" 
+                    "Connection: closed\r\n"
+                    "Content-Type: text/html\r\n\r\n"
+                    "it works!, http parse test <h1>test</h1>"
+                    "<br>"
+                    "<h5>your request payload</h5>%s"
+                    "<hr>"
+                    "<center>made by ./tcpserver gdb debugging at pid %d\n", buf, getpid());
+
+    write(container_data2thread->multithreading_struct[free_num].fd_from_accept, tempbuf, strlen(tempbuf));
+
+    
+    // printf("buf res %s\n", buf);
+    // write(container_data2thread->multithreading_struct[free_num].fd_from_accept, buf, strlen(buf));
+    //leep(2);
     close(container_data2thread->multithreading_struct[free_num].fd_from_accept);
+
+    container_data2thread->multithreading_struct[free_num].state = DEAD;
     // char tempbuf[23];
     // snprintf(tempbuf, sizeof(tempbuf), "in else catch %d on thread\n", container_data2thread->free_num);
     // write(accept_ret, tempbuf, sizeof(tempbuf) - 1);
@@ -268,6 +281,29 @@ void* run_eventloop_daemon(void *data)
     }
 }
 
+
+void daemon_cleaning(struct multithreading_struct *multithreading_struct, struct tcp_structure *tcp_structure)
+{
+    for(int i = 0; i < _CONFIG_TCP_MAX_CONN; i++)
+    {
+        
+        if (
+            multithreading_struct[i].ready_to_be_use == NO && 
+            multithreading_struct[i].state == DEAD && 
+            (_CONFIG_TCP_SPACE_BETWEEN_TIME_CLEANUP != 0 
+                ? (((multithreading_struct[i].timestamp + _CONFIG_TCP_SPACE_BETWEEN_TIME_CLEANUP) < time(NULL))) 
+                : 1 ))
+        {
+            pthread_join(multithreading_struct[i].thread_addr, NULL);
+            multithreading_struct[i].ready_to_be_use = YES;
+            pthread_join(multithreading_struct->thread_addr, NULL);
+            printf("thread %d joined\n", i);
+
+
+        }
+    }
+}
+
 void start_idling(struct multithreading_struct *multithreading_struct, struct tcp_structure *tcp_structure,
     pthread_t *loop_runnner_pthread_id)
 {
@@ -278,10 +314,11 @@ void start_idling(struct multithreading_struct *multithreading_struct, struct tc
         switch (signal_status) {
             case 0:
                 //##printf("[eventloop-%d] watching, highest %d\n", counter, highest_thread_nums);
+                daemon_cleaning(multithreading_struct, tcp_structure);
                 counter++;
             break;
             case 2:
-                //##printf("[eventloop-%d] SIGINT, highest %d\n", counter, highest_thread_nums);
+                printf("[eventloop-%d] SIGINT, highest %d\n", counter, highest_thread_nums);
                 counter++;
                 // cleaning here
             break;
