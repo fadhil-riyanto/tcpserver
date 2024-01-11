@@ -10,6 +10,7 @@ SET(source
     server/handler/main_handler_recv.c
     helper/cmd_parser.c
     helper/epollfn.c
+    helper/test_function.c
 )
 
 
