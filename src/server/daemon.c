@@ -189,10 +189,10 @@ int make_child(struct multithreading_struct *multithreading_struct,
         // pthread_create(multithreading_struct[free_num].thread_addr, NULL, thread_runner, (void*)&container_data2thread);
         
         // get highest
-        // if (free_num > highest_thread_nums)
-        // {
-        //     highest_thread_nums = free_num;
-        // }
+        if (free_num > highest_thread_nums)
+        {
+            highest_thread_nums = free_num;
+        }
         //##printf("HERE YOUR CREATEDDDDDDDDDDDD %d\n", free_num);
         // char tempbuf[5] = "hai\n";
         // write(accept_ret, tempbuf, sizeof(tempbuf));
@@ -296,7 +296,7 @@ void daemon_cleaning(struct multithreading_struct *multithreading_struct, struct
         {
             pthread_join(multithreading_struct[i].thread_addr, NULL);
             multithreading_struct[i].ready_to_be_use = YES;
-            pthread_join(multithreading_struct->thread_addr, NULL);
+            //pthread_join(multithreading_struct->thread_addr, NULL);
             printf("thread %d joined\n", i);
 
 
@@ -304,8 +304,43 @@ void daemon_cleaning(struct multithreading_struct *multithreading_struct, struct
     }
 }
 
+void cleaning_thread_stack(struct multithreading_struct *multithreading_struct, struct tcp_structure *tcp_structure,
+    pthread_t *loop_runnner_pthread_id, struct epoll_prop *epoll_prop)
+{
+    // cleaning and killing the thread
+    for(int i = 0; i < _CONFIG_TCP_MAX_CONN; i++) {
+        if (multithreading_struct[i].state == ALIVE) 
+        {
+            pthread_kill(multithreading_struct[i].thread_addr, SIGINT);
+            multithreading_struct[i].state = DEAD;
+        }
+
+        if (multithreading_struct[i].ready_to_be_use == NO)
+        {
+            pthread_join(multithreading_struct[i].thread_addr, NULL);
+            multithreading_struct[i].ready_to_be_use = YES;
+        }
+
+        // kill main thread
+        pthread_cancel(*loop_runnner_pthread_id);
+        pthread_kill(*loop_runnner_pthread_id, SIGINT);
+
+        close(tcp_structure->tcpfd);
+        close(epoll_prop->epfd);
+
+        printf("closing fd\n");
+
+        exit(0);
+
+        
+
+    }
+
+    
+}
+
 void start_idling(struct multithreading_struct *multithreading_struct, struct tcp_structure *tcp_structure,
-    pthread_t *loop_runnner_pthread_id)
+    pthread_t *loop_runnner_pthread_id, struct epoll_prop *epoll_prop)
 {
     int counter = 0;
 
@@ -319,7 +354,8 @@ void start_idling(struct multithreading_struct *multithreading_struct, struct tc
             break;
             case 2:
                 printf("[eventloop-%d] SIGINT, highest %d\n", counter, highest_thread_nums);
-                counter++;
+                cleaning_thread_stack(multithreading_struct, tcp_structure, loop_runnner_pthread_id, epoll_prop);
+                // exit(0);
                 // cleaning here
             break;
         }
@@ -363,7 +399,7 @@ int start_daemon(struct tcp_structure *tcp_structure)
     // char buf[1024];
 
     //while(1){ sleep(1); //##printf("looping %d\n", loops); loops++;}
-    start_idling(multithreading_struct, tcp_structure, &loop_runnner_pthread_id);
+    start_idling(multithreading_struct, tcp_structure, &loop_runnner_pthread_id, &epoll_prop);
     // close(ret);
     // close(tcp_structure->tcpfd);
     return 0;
