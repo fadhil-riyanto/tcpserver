@@ -11,7 +11,10 @@
 
 void tcpfd_create(struct tcp_structure *tcp_structure)
 {
+    int option = 1;
     tcp_structure->tcpfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+    setsockopt(tcp_structure->tcpfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+    
     if (tcp_structure->tcpfd < 0) {
         perror("socket");
     }
@@ -25,7 +28,6 @@ void tcpfd_set_prop(struct tcp_structure *tcp_structure, char *addr, int listenp
     tcp_structure->sockaddr_in.sin_port = htons(listenport);
     tcp_structure->sockaddr_in.sin_addr.s_addr = inet_addr(addr);
 }
-
 
 void tcpfd_bind_and_listen(struct tcp_structure *tcp_structure)
 {
