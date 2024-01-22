@@ -62,11 +62,14 @@ int rand_thread_get_free_num(struct multithreading_struct *multithreading_struct
 {
     for(int i = 0; i < _CONFIG_TCP_MAX_CONN; i++)
     {
-        if (multithreading_struct[i].state == DEAD && multithreading_struct[i].ready_to_be_use == YES && multithreading_struct[i].timestamp == 0)
+        if (multithreading_struct[i].state == DEAD && multithreading_struct[i].ready_to_be_use == YES)
         {
             return i;
         }
     }
+
+    // printf("show internal data:\n");
+    // printf("state: %d", (multithreading_struct[i].state) ? 1 : 0)
     return -1; // no thread avaiable
 }
 
