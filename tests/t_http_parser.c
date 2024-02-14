@@ -1,49 +1,7 @@
 #include <stddef.h>
+#include "t_http_parser.h"
 
-// tests
-#include <stdio.h>
-
-// config
-#define HTTP_MAX_URI 4000
-
-typedef enum 
-{
-    HTTP_GET, HTTP_PUT, HTTP_POST
-} HTTP_METHODS_t;
-
-typedef enum 
-{
-    HTTP_0_9, HTTP_1_0, HTTP_1_1
-} HTTP_VERSION_t;
-
-struct parse_prop_internal_
-{
-    char *source;
-    int stop_offset;
-    size_t size;
-};
-
-struct host_prop_internal_
-{
-    char host[253];
-    int post;
-};
-
-struct http_parse_result
-{
-    HTTP_METHODS_t method;
-    char URI[HTTP_MAX_URI];
-    struct host_prop_internal_ host;
-    char *useragent;
-
-};
-
-struct exploded_string_by_lineend
-{
-    char *string;
-};
-
-static struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
+struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
 {
     struct parse_prop_internal_ parse_prop_internal_ = {
         data, 0, size
@@ -52,45 +10,76 @@ static struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
     return parse_prop_internal_;
 }
 
-static int explode_by_lineend(struct parse_prop_internal_ *parse_prop_internal_)
+void http_parse_start(struct parse_prop_internal_ *parse_prop_internal_, struct http_parse_result *http_parse_result)
 {
+    struct explode_map explode_map = {
+        0, malloc(0)
+    };
 
+    // mapping all offset that contains \r\n
+    explode_by_lineend(parse_prop_internal_, &explode_map);
+
+    for(int i = 0; i < explode_map.counting_arr; i++)
+    {
+        char *string = return_string_by_index(parse_prop_internal_->source, explode_map.explode_mapping_offset[i].starting_from, explode_map.explode_mapping_offset[i].ending_at);
+        printf("starting %d end %d: %s\n", explode_map.explode_mapping_offset[i].starting_from, explode_map.explode_mapping_offset[i].ending_at, string);
+
+        free(string);
+    }
+
+    // cleanup
+    free(explode_map.explode_mapping_offset);
+}
+
+char *return_string_by_index(char *src, int from, int to)
+{
+    char *returned_string = (char *)malloc(sizeof(char) * ((to - from) + 1));
+    int length = to - from;
+    int i;
+
+    for(i = 0; i < (length) ; i++)
+    {
+        returned_string[i] = src[from];
+        from = from + 1;
+    }
+
+    returned_string[i] = '\0';
+    return returned_string;
+}
+
+int explode_by_lineend(struct parse_prop_internal_ *parse_prop_internal_, struct explode_map *explode_map)
+{
     // init
-    
+    int first_literations = 1;
     int i = 0;
     for(;;)
     {
-        if(parse_prop_internal_->source[parse_prop_internal_->stop_offset + i] == '\r' && \
-            parse_prop_internal_->source[parse_prop_internal_->stop_offset + (i + 1)] == '\n')
+        if(parse_prop_internal_->source[i] == '\r' && \
+            parse_prop_internal_->source[(i + 1)] == '\n') 
         {
-            
-            //parse_prop_internal_->stop_offset = parse_prop_internal_->stop_offset + 1;
-            printf("found at %d and %d", i, i + 1);
+            explode_map->counting_arr = explode_map->counting_arr + 1;
+            explode_map->explode_mapping_offset = realloc(explode_map->explode_mapping_offset, 
+                sizeof(struct explode_mapping_offset) * explode_map->counting_arr);
+
+            if (first_literations == 1)
+            {
+                explode_map->explode_mapping_offset[explode_map->counting_arr - 1].starting_from = 0;
+                explode_map->explode_mapping_offset[explode_map->counting_arr - 1].ending_at = (i + 1);
+
+                // change state
+                first_literations = 0;
+            } else {
+                explode_map->explode_mapping_offset[explode_map->counting_arr - 1].starting_from = 
+                    (explode_map->explode_mapping_offset[explode_map->counting_arr - 1 - 1].ending_at + 1);
+                    
+                explode_map->explode_mapping_offset[explode_map->counting_arr - 1].ending_at = (i + 1);
+            }
+            //printf("found\n");
+        } else if (parse_prop_internal_->source[i] == '\0')
+        {
             break;
         }
         i++;
     }
     // printf("%d\n", parse_prop_internal_->stop_offset);
-}
-
-
-int main()
-{
-    static char http_payload_sample[8192] =
-        "GET / HTTP/1.1\r\n"
-        "Host: 127.0.0.1:10001\r\n"
-        "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0\r\n"
-        "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\r\n"
-        "Accept-Language: en-US,en;q=0.5\r\n"
-        "Accept-Encoding: gzip, deflate, br\r\n"
-        "Connection: keep-alive\r\n"
-        "Upgrade-Insecure-Requests: 1\r\n"
-        "Sec-Fetch-Dest: document\r\n"
-        "Sec-Fetch-Mode: navigate\r\n"
-        "Sec-Fetch-Site: none\r\n"
-        "Sec-Fetch-User: ?1\r\n";
-
-    struct parse_prop_internal_ parse_prop_internal_ = http_parse_loads(http_payload_sample, sizeof(http_payload_sample));
-    explode_by_lineend(&parse_prop_internal_);
-    // printf("%s\n", parse_prop_internal_.source);
 }
