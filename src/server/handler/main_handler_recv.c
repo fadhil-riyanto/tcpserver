@@ -1,26 +1,11 @@
 #include "header/main_handler_recv.h"
 #include <stdio.h>
+#include <unistd.h>
+#include <string.h>
 
-void conn_accept(int fd, struct conn_prop *conn_prop)
+void conn_to_handle(int fd_for_write, struct sockaddr_in *sockaddr_in, char *datarecv_from_fd)
 {
-    int accept_ret;
-    char buffer[4096];
-    socklen_t socklen;
-    struct sockaddr_in sockaddr_in;
-    
-
-    socklen = sizeof(sockaddr_in);
-        
-    accept_ret = accept(fd, (struct sockaddr*)&sockaddr_in, &socklen);
-
-    
-
-    char buf[4096];
-
-    read(accept_ret, buf, sizeof(buf));
-
-    
-    char tempbuf[4096];
+    char tempbuf[16384];
     snprintf(tempbuf, sizeof(tempbuf), "HTTP/1.1 200\r\n" 
                     "Connection: closed\r\n"
                     "Content-Type: text/html\r\n\r\n"
@@ -28,13 +13,8 @@ void conn_accept(int fd, struct conn_prop *conn_prop)
                     "<br>"
                     "<h5>your request payload</h5>%s"
                     "<hr>"
-                    "<center>made by ./tcpserver gdb debugging at pid %d", buf, getpid());
-    send(accept_ret, tempbuf, sizeof(tempbuf) - 1, 0);
-}
+                    "<center>made by ./tcpserver gdb debugging at pid %d on conn_to_handle func\n", datarecv_from_fd, getpid());
 
-void conn_to_handle(int fd)
-{
-    struct conn_prop conn_prop;
-    conn_accept(fd, &conn_prop);
-       
+    write(fd_for_write, tempbuf, strlen(tempbuf));
+
 }
