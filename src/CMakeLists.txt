@@ -8,6 +8,7 @@ SET(source
     server/server.c
     server/daemon.c
     server/handler/main_handler_recv.c
+    server/handler/http_err.c
     helper/cmd_parser.c
     helper/epollfn.c
     helper/test_function.c

@@ -2,6 +2,7 @@
 #include "../helper/header/epollfn.h"
 #include "server.h"
 #include "handler/header/main_handler_recv.h"
+#include "handler/header/http_err.h"
 #include <errno.h>
 #include <string.h>
 #include <strings.h>
@@ -150,10 +151,12 @@ int make_child(struct multithreading_struct *multithreading_struct,
         socklen = sizeof(sockaddr_in);
         accept_ret = accept(epoll_prop->events[fd_num_unique].data.fd, (struct sockaddr*)&sockaddr_in, &socklen);
         
-        char tempbuf[23] = "server currently busy\n";
-        write(accept_ret, tempbuf, sizeof(tempbuf) - 1);
+        // char tempbuf[23] = "server currently busy\n";
+        // write(accept_ret, tempbuf, sizeof(tempbuf) - 1);
 
-        printf("recvfrom %d\n", free_num);
+        // printf("recvfrom %d\n", free_num);
+        
+        http_too_many_requests(accept_ret);
         close(accept_ret);
     } else {
         socklen = sizeof(sockaddr_in);
