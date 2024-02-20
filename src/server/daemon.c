@@ -81,35 +81,29 @@ void *thread_runner(void *data)
     struct container_data2thread *container_data2thread = (struct container_data2thread*)data;
     int free_num = container_data2thread->free_num;
 
-    //printf("making threadd wkwkw\n");
-    
-    // int accept_ret;
     char buf[8192];
-    // struct sockaddr_in sockaddr_in;
-    // socklen_t socklen;
-    // socklen = sizeof(sockaddr_in);
-    // accept_ret = accept(container_data2thread->tcp_structure->tcpfd, (struct sockaddr*)&sockaddr_in, &socklen);
-    
+   
     read(container_data2thread->multithreading_struct[free_num].fd_from_accept, buf, sizeof(buf));
 
-    //printf("%s\n", buf);
-    // check_line_ending(buf);
-    char tempbuf[16384];
-    snprintf(tempbuf, sizeof(tempbuf), "HTTP/1.1 200\r\n" 
-                    "Connection: closed\r\n"
-                    "Content-Type: text/html\r\n\r\n"
-                    "it works!, http parse test <h1>test</h1>"
-                    "<br>"
-                    "<h5>your request payload</h5>%s"
-                    "<hr>"
-                    "<center>made by ./tcpserver gdb debugging at pid %d\n", buf, getpid());
+    conn_to_handle(container_data2thread->multithreading_struct[free_num].fd_from_accept, &container_data2thread->multithreading_struct[free_num].sockaddr_in, buf);
+    // //printf("%s\n", buf);
+    // // check_line_ending(buf);
+    // char tempbuf[16384];
+    // snprintf(tempbuf, sizeof(tempbuf), "HTTP/1.1 200\r\n" 
+    //                 "Connection: closed\r\n"
+    //                 "Content-Type: text/html\r\n\r\n"
+    //                 "it works!, http parse test <h1>test</h1>"
+    //                 "<br>"
+    //                 "<h5>your request payload</h5>%s"
+    //                 "<hr>"
+    //                 "<center>made by ./tcpserver gdb debugging at pid %d\n", buf, getpid());
 
-    write(container_data2thread->multithreading_struct[free_num].fd_from_accept, tempbuf, strlen(tempbuf));
+    // write(container_data2thread->multithreading_struct[free_num].fd_from_accept, tempbuf, strlen(tempbuf));
 
     
-    // printf("buf res %s\n", buf);
-    // write(container_data2thread->multithreading_struct[free_num].fd_from_accept, buf, strlen(buf));
-    //leep(2);
+    // // printf("buf res %s\n", buf);
+    // // write(container_data2thread->multithreading_struct[free_num].fd_from_accept, buf, strlen(buf));
+    // //leep(2);
     close(container_data2thread->multithreading_struct[free_num].fd_from_accept);
 
     container_data2thread->multithreading_struct[free_num].state = DEAD;

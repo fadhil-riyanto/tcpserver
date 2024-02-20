@@ -5,10 +5,12 @@
 
 struct conn_prop
 {
-    int fd;                             // fd from accept
-    struct sockaddr_in *sockaddr_in;    // sockaddr_in from accept
+    int fd_for_write;                             // fd from accept, used to write operation (output)
+    struct sockaddr_in *sockaddr_in;            // sockaddr_in from accept
+
+    char *datarecv_from_fd;
 };
 
-void conn_to_handle(int fd);
+void conn_to_handle(int fd_for_write, struct sockaddr_in *sockaddr_in, char *datarecv_from_fd);
 
 #endif
