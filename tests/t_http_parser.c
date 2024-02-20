@@ -10,6 +10,13 @@ struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
     return parse_prop_internal_;
 }
 
+void internal_parser(char *data, struct http_parse_result *http_parse_result)
+{
+    // printf("%s\n", data);
+    // get http
+    
+}
+
 void http_parse_start(struct parse_prop_internal_ *parse_prop_internal_, struct http_parse_result *http_parse_result)
 {
     struct explode_map explode_map = {
@@ -22,7 +29,9 @@ void http_parse_start(struct parse_prop_internal_ *parse_prop_internal_, struct 
     for(int i = 0; i < explode_map.counting_arr; i++)
     {
         char *string = return_string_by_index(parse_prop_internal_->source, explode_map.explode_mapping_offset[i].starting_from, explode_map.explode_mapping_offset[i].ending_at);
-        printf("starting %d end %d: %s\n", explode_map.explode_mapping_offset[i].starting_from, explode_map.explode_mapping_offset[i].ending_at, string);
+        //printf("%c\n", string[0]);
+        internal_parser(string, http_parse_result);
+
 
         free(string);
     }

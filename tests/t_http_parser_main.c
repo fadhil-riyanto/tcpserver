@@ -16,6 +16,9 @@ int main()
         "Sec-Fetch-Mode: navigate\r\n"
         "Sec-Fetch-Site: none\r\n"
         "Sec-Fetch-Site: none\r\n"
+        "Sec-Fetch-soyu: none\r\n"
+        "Sec-Fetch-alpha: none\r\n"
+        "Sec-Fetch-betha: none\r\n"
         "Sec-Fetch-User: ?1\r\n";
 
     struct http_parse_result http_parse_result;
