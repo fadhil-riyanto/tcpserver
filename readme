@@ -1,0 +1,1 @@
+a tiny server that made of pure socket c, using epoll to manage event, and pthread as multithreading server, just like nginx
