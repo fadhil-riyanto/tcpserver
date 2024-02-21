@@ -1,5 +1,7 @@
 #include <stddef.h>
+#include <string.h>
 #include "t_http_parser.h"
+#include "t_utils.h"
 
 struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
 {
@@ -12,7 +14,21 @@ struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
 
 void internal_parser(char *data, struct http_parse_result *http_parse_result)
 {
-    // printf("%s\n", data);
+    char *dest;
+    int ret;
+    int index = 0;
+
+    do {
+        ret = split(' ', data, strlen(data), index, &dest);
+
+        index = index + 1;
+
+        if (strcmp(dest, "GET") == 0) {
+            printf("get detected\n");
+        } else if (strcmp(dest, "/") == 0) {
+            printf("at / detected\n");
+        }
+    } while (ret != 3);
     // get http
     
 }

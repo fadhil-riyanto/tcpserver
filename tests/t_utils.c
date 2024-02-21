@@ -1,9 +1,5 @@
-// split by space, ended by \0
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "t_utils.h"
 
 /*
  * ret
@@ -69,19 +65,4 @@ int split(char separator, char *txt, int size, int return_index_of, char **dest)
         }
     }
     return 2;
-}
-
-int main()
-{
-    char *txt = "abc:def:ghi";
-    char *dest;
-    int ret;
-
-    // for(int i = 0; i < 4; i++)
-    // {
-    ret = split(':', txt, strlen(txt), 3, &dest);
-    // }
-
-    printf("\" %d -> %s\"\n", ret, dest);
-    free(dest);
 }
