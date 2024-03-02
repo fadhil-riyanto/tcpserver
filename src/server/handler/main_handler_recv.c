@@ -9,9 +9,9 @@ void conn_to_handle(int fd_for_write, struct sockaddr_in *sockaddr_in, char *dat
     snprintf(tempbuf, sizeof(tempbuf), "HTTP/1.1 200\r\n" 
                     "Connection: closed\r\n"
                     "Content-Type: text/html\r\n\r\n"
-                    "it works!, http parse test <h1>test</h1>"
+                    "<h1>it works!</h1>, http parse test test"
                     "<br>"
-                    "<h5>your request payload</h5>%s"
+                    "<h5>your request payload</h5> : %s"
                     "<hr>"
                     "<center>made by ./tcpserver gdb debugging at pid %d on conn_to_handle func\n", datarecv_from_fd, getpid());
 
