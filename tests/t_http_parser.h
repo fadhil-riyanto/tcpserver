@@ -33,10 +33,14 @@ struct host_prop_internal_
     int post;
 };
 
+// HERE BRO!
 struct http_parse_result
 {
     HTTP_METHODS_t method;
     char URI[HTTP_MAX_URI];
+    HTTP_VERSION_t version;
+
+
     struct host_prop_internal_ host;
     char *useragent;
 };

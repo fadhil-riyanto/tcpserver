@@ -29,13 +29,27 @@ int main()
     // second test
     // char *sample = "abcdefghij";
     // char *data = return_string_by_index(sample, 2, 5); // cde
-    // printf("result: %s", data);
+
+    // http method string (optional)
+    const char* HTTP_METHODS_STR[] = {
+        "HTTP_GET", "HTTP PUT", "HTTP POST" 
+    };
+
+    const char* HTTP_VERSION_STR[] = {
+        "HTTP_0.9", "HTTP 1.0", "HTTP 1.1" 
+    };
+
+    printf("result: \n\n"
+                    "http method :%s\n"
+                    "http route: %s\n"
+                    "http version: %s\n", HTTP_METHODS_STR[http_parse_result.method], http_parse_result.URI,
+                                            HTTP_VERSION_STR[http_parse_result.version]);
 
     // free(data);
-    // sample = "abcfwfghij";
-    // data = return_string_by_index(sample, 2, 5); // cfw
+    // char *sample = "abcfwfghij";
+    // char *data = return_string_by_index(sample, 7, 10); // hij
 
-    // printf("result: %s", data);
+    // printf("result: \"%s\"\n", data);
 
     // free(data);
 }
