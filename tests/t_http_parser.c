@@ -25,13 +25,12 @@ void internal_parser(char *data, struct http_parse_result *http_parse_result)
     do {
         // ret = split(' ', data, strlen(data), index, dest);
         ret = split(' ', data, strlen(data), index, dest);
-        //retq = split(' ', data, strlen(data), 0, firstwords);
+        retq = split(' ', data, strlen(data), 0, firstwords);
 
         // ret = 3;
         if (linecounter == 0) {
-            // printf("%s\n", dest);
-            
             if (strcmp(firstwords, "GET") == 0) {
+                // printf("http get here\n");
                 http_parse_result->method = HTTP_GET;
             } else if (strcmp(firstwords, "PUT") == 0) {
                 http_parse_result->method = HTTP_PUT;
@@ -40,8 +39,8 @@ void internal_parser(char *data, struct http_parse_result *http_parse_result)
             }
 
             if (index == 1) {
-                // strcpy(http_parse_result->URI, dest);
-                printf("%s\n", dest);
+                strcpy(http_parse_result->URI, dest);
+                // printf("%s\n", dest);
             }
 
             if (index == 3) {
@@ -57,6 +56,8 @@ void internal_parser(char *data, struct http_parse_result *http_parse_result)
                 //printf("\"%s\n", data);
 
             }
+        } else {
+            ret = split(':', data, strlen(data), 0, firstwords);
         }
 
         // free(dest);

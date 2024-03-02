@@ -4,7 +4,7 @@
 int main()
 {
     static char http_payload_sample[8192] =
-        "GET / HTTP/1.1\r\n"
+        "GET /data?wkwk=abc%20def%20ghi HTTP/1.1\r\n"
         "Host: 127.0.0.1:10001\r\n"
         "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0\r\n"
         "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\r\n"
@@ -45,6 +45,7 @@ int main()
                     "http version: %s\n", HTTP_METHODS_STR[http_parse_result.method], http_parse_result.URI,
                                             HTTP_VERSION_STR[http_parse_result.version]);
 
+    // printf("%d\n", http_parse_result.version);
     // free(data);
     // char *sample = "abcfwfghij";
     // char *data = return_string_by_index(sample, 7, 10); // hij
