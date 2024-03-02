@@ -1,5 +1,6 @@
 
 #include "t_utils.h"
+#include <string.h>
 
 /*
  * ret
@@ -8,10 +9,10 @@
  * 2 not found
  * 3 index overflow
  */
-int split(char separator, char *txt, int size, int return_index_of, char **dest)
+int split(char separator, char *txt, int size, int return_index_of, char *dest)
 {
     
-    char *chartemp = malloc(sizeof(chartemp) * 200);
+    char *chartemp = (char*)malloc((sizeof(char) * 200));
     int counter = 0;
     int index = 0;
     int split_loop = 0;
@@ -35,8 +36,8 @@ int split(char separator, char *txt, int size, int return_index_of, char **dest)
             if (foundindex == return_index_of) {
                 //printf("indexof %d: \"%s\"\n", return_index_of, chartemp);
                 //strcpy(chartemp,  *dest);
-                //strcpy(dest, chartemp);
-                *dest = chartemp;
+                strcpy(dest, chartemp);
+                free(chartemp);
                 return 0;
             }
             foundindex = foundindex + 1;
@@ -49,13 +50,16 @@ int split(char separator, char *txt, int size, int return_index_of, char **dest)
             chartemp[a] = '\0'; 
             if (foundindex == return_index_of) {
                 //printf("indexof %d: \"%s\"\n", return_index_of, chartemp);
-                // strcpy(chartemp, **dest);
-                *dest= chartemp;
+                strcpy(dest, chartemp);
+                free(chartemp);
+                // *dest= chartemp;
                 return 1;
             }
             if (return_index_of > foundindex)
             {
+                free(chartemp);
                 return 3;
+                
             }
             foundindex = foundindex + 1;
             
@@ -64,5 +68,7 @@ int split(char separator, char *txt, int size, int return_index_of, char **dest)
             index = index + 1;
         }
     }
+    free(chartemp);
     return 2;
+    
 }

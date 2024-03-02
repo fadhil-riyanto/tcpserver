@@ -12,7 +12,7 @@
  * 2 not found
  * 3 index overflow
  */
-int split(char separator, char *txt, int size, int return_index_of, char **dest)
+int split(char separator, char *txt, int size, int return_index_of, char *dest)
 {
     
     char *chartemp = malloc(sizeof(chartemp) * 200);
@@ -39,8 +39,8 @@ int split(char separator, char *txt, int size, int return_index_of, char **dest)
             if (foundindex == return_index_of) {
                 //printf("indexof %d: \"%s\"\n", return_index_of, chartemp);
                 //strcpy(chartemp,  *dest);
-                //strcpy(dest, chartemp);
-                *dest = chartemp;
+                strcpy(dest, chartemp);
+                free(chartemp);
                 return 0;
             }
             foundindex = foundindex + 1;
@@ -53,8 +53,9 @@ int split(char separator, char *txt, int size, int return_index_of, char **dest)
             chartemp[a] = '\0'; 
             if (foundindex == return_index_of) {
                 //printf("indexof %d: \"%s\"\n", return_index_of, chartemp);
-                // strcpy(chartemp, **dest);
-                *dest= chartemp;
+                strcpy(dest, chartemp);
+                free(chartemp);
+                // *dest= chartemp;
                 return 1;
             }
             if (return_index_of > foundindex)
@@ -73,15 +74,18 @@ int split(char separator, char *txt, int size, int return_index_of, char **dest)
 
 int main()
 {
-    char *txt = "abc:def:ghi";
-    char *dest;
+    char *txt = "abc def ghi";
+    char dest[200];
     int ret;
 
     // for(int i = 0; i < 4; i++)
     // {
-    ret = split(':', txt, strlen(txt), 3, &dest);
+    ret = split(' ', txt, strlen(txt), 0, dest);
+    ret = split(' ', txt, strlen(txt), 1, dest);
+    ret = split(' ', txt, strlen(txt), 2, dest);
+    ret = split(' ', txt, strlen(txt), 3, dest);
     // }
 
-    printf("\" %d -> %s\"\n", ret, dest);
-    free(dest);
+    printf("\"%s\"\n", ret);
+    // free(dest);
 }

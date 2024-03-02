@@ -6,6 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-int split(char separator, char *txt, int size, int return_index_of, char **dest);
+int split(char separator, char *txt, int size, int return_index_of, char *dest);
 
 #endif
