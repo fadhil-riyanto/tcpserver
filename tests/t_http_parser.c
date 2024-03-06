@@ -15,20 +15,25 @@ struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
     return parse_prop_internal_;
 }
 
-void internal_parser(char *data, struct http_parse_result *http_parse_result)
+int internal_parser(char *data, struct http_parse_result *http_parse_result)
 {
+    // printf("\"%s\"\n", data);
+    // return 0;
     char dest[200];
     char firstwords[200];
     int ret, retq;
     int index = 0;
 
-    do {
-        // ret = split(' ', data, strlen(data), index, dest);
-        ret = split(' ', data, strlen(data), index, dest);
-        retq = split(' ', data, strlen(data), 0, firstwords);
+    // do {
+        
 
         // ret = 3;
-        if (linecounter == 0) {
+    if (linecounter == 0) {
+        do {
+            //printf("loading string now\n");
+            ret = split(' ', data, strlen(data), index, dest);
+            retq = split(' ', data, strlen(data), 0, firstwords);
+
             if (strcmp(firstwords, "GET") == 0) {
                 // printf("http get here\n");
                 http_parse_result->method = HTTP_GET;
@@ -56,15 +61,48 @@ void internal_parser(char *data, struct http_parse_result *http_parse_result)
                 //printf("\"%s\n", data);
 
             }
-        } else {
-            ret = split(':', data, strlen(data), 0, firstwords);
+            index = index + 1;
+        } while (ret != 3);
+        
+        
+    } else {
+        ret = split(':', data, strlen(data), 0, firstwords);
+        // printf("%s\n", (strcmp(firstwords, "Host") == 0 ? "1" : "0"));
+        
+        if (strcmp(firstwords, "Host") == 0) {
+            ret = split(':', data, strlen(data), 1, firstwords);
+
+            memmove(firstwords, firstwords + 1, strlen(firstwords));
+            strcpy(http_parse_result->host, firstwords);
+        } else if (strcmp(firstwords, "User-Agent") == 0) {
+            ret = split(':', data, strlen(data), 1, firstwords);
+
+            memmove(firstwords, firstwords + 1, strlen(firstwords));
+            strcpy(http_parse_result->useragent, firstwords);
+        } else if (strcmp(firstwords, "Accept") == 0) {
+            ret = split(':', data, strlen(data), 1, firstwords);
+
+            memmove(firstwords, firstwords + 1, strlen(firstwords));
+            strcpy(http_parse_result->accept, firstwords);
+        } else if (strcmp(firstwords, "Accept-Language") == 0) {
+            ret = split(':', data, strlen(data), 1, firstwords);
+
+            memmove(firstwords, firstwords + 1, strlen(firstwords));
+            strcpy(http_parse_result->accept_language, firstwords);
+        } else if (strcmp(firstwords, "Accept-Encoding") == 0) {
+            ret = split(':', data, strlen(data), 1, firstwords);
+
+            memmove(firstwords, firstwords + 1, strlen(firstwords));
+            strcpy(http_parse_result->accept_encoding, firstwords);
         }
+        
+    }
 
-        // free(dest);
-        // free(firstwords);
+    // free(dest);
+    // free(firstwords);
 
-        index = index + 1;
-    } while (ret != 3);
+    
+    // } while (ret != 3);
 
     linecounter = linecounter + 1;
     // get http
@@ -88,7 +126,7 @@ void http_parse_start(struct parse_prop_internal_ *parse_prop_internal_, struct 
 
 
         free(string);
-        // printf("start %d end %d\n", explode_map.explode_mapping_offset[i].starting_from, explode_map.explode_mapping_offset[i].ending_at);
+        //printf("block offset start %d end %d\n", explode_map.explode_mapping_offset[i].starting_from, explode_map.explode_mapping_offset[i].ending_at);
     }
 
     // cleanup
@@ -134,7 +172,7 @@ int explode_by_lineend(struct parse_prop_internal_ *parse_prop_internal_, struct
                 first_literations = 0;
             } else {
                 explode_map->explode_mapping_offset[explode_map->counting_arr - 1].starting_from = 
-                    (explode_map->explode_mapping_offset[explode_map->counting_arr - 1 - 1].ending_at + 1);
+                    (explode_map->explode_mapping_offset[explode_map->counting_arr - 2].ending_at + 2);
                     
                 explode_map->explode_mapping_offset[explode_map->counting_arr - 1].ending_at = (i);
             }

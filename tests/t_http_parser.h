@@ -20,6 +20,11 @@ typedef enum
     HTTP_0_9, HTTP_1_0, HTTP_1_1
 } HTTP_VERSION_t;
 
+typedef enum
+{
+    KEEP_ALIVE, CLOSE
+} TCP_CONNECTION_t;
+
 struct parse_prop_internal_
 {
     char *source;
@@ -39,10 +44,15 @@ struct http_parse_result
     HTTP_METHODS_t method;
     char URI[HTTP_MAX_URI];
     HTTP_VERSION_t version;
+    char host[200];
+    char useragent[200];
+    char accept[200];
+    char accept_language[200];
+    char accept_encoding[200];
+    TCP_CONNECTION_t connection;
+    int upgrade_insecure_requests;
 
-
-    struct host_prop_internal_ host;
-    char *useragent;
+    
 };
 
 // internal
