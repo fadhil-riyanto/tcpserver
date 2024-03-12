@@ -3,12 +3,12 @@
 #include <string.h>
 
 /*
- * ret
-* 0 eq literating
+ * return
+ * 0 literating
  * 1 eq last
  * 2 not found
  * 3 index overflow
- */
+ */ 
 int split(char separator, char *txt, int size, int return_index_of, char *dest)
 {
     
