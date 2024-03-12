@@ -1,5 +1,6 @@
 #include "uriparser.h"
 #include <asm-generic/errno-base.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../t_utils.h"
@@ -94,10 +95,22 @@ char* uriparser_get_params(struct internal_dataparser *internal_dataparser, char
             // printf("%s\n", internal_dataparser->datastore_session[i].value);
             // strcpy(tempchar, internal_dataparser->datastore_session[i].value);
             return internal_dataparser->datastore_session[i].value;
-        } else {
-            return 0;
-        }
+        } 
     }
+    return 0;
 
     // printf("%s\n", internal_dataparser->datastore_session[1].key);
+}
+
+char* urlparser_stringfy(struct internal_dataparser *internal_dataparser)
+{
+    char temp[(200 * 2) + 9];
+    char* ret = (char*)malloc((((sizeof(char) * 200) * 2) + 9) * internal_dataparser->capacity);
+    for(int i = 0; i < internal_dataparser->capacity - 1; i++) {
+        snprintf(temp, sizeof(temp), "\"%s\" => \"%s\",", internal_dataparser->datastore_session[i].key, internal_dataparser->datastore_session[i].value);
+        
+        strcat(ret, temp);
+    }
+    // printf("%s\n", ret);
+    return ret;
 }
