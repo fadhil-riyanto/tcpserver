@@ -4,8 +4,8 @@
 int main()
 {
     static char http_payload_sample[8192] =
-        "GET /data?wkwk=abc%20def%20ghi HTTP/1.1\r\n"
-        "Host: 127.0.0.1:10001\r\n"
+        "GET /data?wkwk=abc%20def%20ghi HTTP/1.1\r\n"        // start from 0 to 39 + two carriage return, so
+        "Host: 127.0.0.1:10001\r\n"                          // next, (39 + 2) = 41, start 42 to (42 + 21),
         "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0\r\n"
         "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\r\n"
         "Accept-Language: en-US,en;q=0.5\r\n"
@@ -22,6 +22,8 @@ int main()
         "Sec-Fetch-User: ?1\r\n";
 
     struct http_parse_result http_parse_result;
+
+    
 
     struct parse_prop_internal_ parse_prop_internal_ = http_parse_loads(http_payload_sample, sizeof(http_payload_sample));
     http_parse_start(&parse_prop_internal_, &http_parse_result);
@@ -40,10 +42,11 @@ int main()
     };
 
     printf("result: \n\n"
-                    "http method :%s\n"
-                    "http route: %s\n"
-                    "http version: %s\n", HTTP_METHODS_STR[http_parse_result.method], http_parse_result.URI,
-                                            HTTP_VERSION_STR[http_parse_result.version]);
+                    "http method    :%s\n"
+                    "http route     :%s\n"
+                    "http version   :%s\n"
+                    "host           :%s\n", HTTP_METHODS_STR[http_parse_result.method], http_parse_result.URI,
+                                            HTTP_VERSION_STR[http_parse_result.version], http_parse_result.host);
 
     // printf("%d\n", http_parse_result.version);
     // free(data);
