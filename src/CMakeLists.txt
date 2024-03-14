@@ -12,11 +12,15 @@ SET(source
     helper/cmd_parser.c
     helper/epollfn.c
     helper/test_function.c
+    helper/http_parser.c
+    helper/uriparser.c
+    helper/utils.c
 )
 
 
 add_library(sourcelib STATIC "${source}")
 add_executable(mainsource main.c)
+add_compile_options(-Wall-pointer-types)
 
 target_link_libraries(mainsource sourcelib)
 
