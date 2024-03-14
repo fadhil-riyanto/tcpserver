@@ -4,7 +4,7 @@
 #include "header/http_parser.h"
 #include "header/utils.h"
 
-int volatile linecounter = 0;
+int linecounter = 0;
 
 struct parse_prop_internal_ http_parse_loads(char *data, size_t size)
 {
@@ -28,6 +28,7 @@ int internal_parser(char *data, struct http_parse_result *http_parse_result)
         
 
         // ret = 3;
+    // printf("doing here %d\n", linecounter);
     if (linecounter == 0) {
         do {
             //printf("loading string now\n");
@@ -42,10 +43,11 @@ int internal_parser(char *data, struct http_parse_result *http_parse_result)
             } else if (strcmp(firstwords, "POST") == 0) {
                 http_parse_result->method = HTTP_POST;
             }
-
+            
+            
             if (index == 1) {
                 strcpy(http_parse_result->URI, dest);
-                // printf("%s\n", dest);
+                
             }
 
             if (index == 3) {
@@ -131,6 +133,7 @@ void http_parse_start(struct parse_prop_internal_ *parse_prop_internal_, struct 
 
     // cleanup
     free(explode_map.explode_mapping_offset);
+    linecounter = 0;
 }
 
 char *return_string_by_index(char *src, int from, int to)
