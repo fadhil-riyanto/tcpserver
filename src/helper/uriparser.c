@@ -1,12 +1,13 @@
 #include "header/uriparser.h"
 #include <asm-generic/errno-base.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "header/utils.h"
 
 void internal_urlparser(struct internal_dataparser *internal_dataparser)
 {
-    char pathstring[200];
+    static char pathstring[200];
     char paramsstring[200];
     char paramsraw[200];
     char key[200];
@@ -16,7 +17,7 @@ void internal_urlparser(struct internal_dataparser *internal_dataparser)
 
     ret = split('?', internal_dataparser->source, internal_dataparser->length, 0, pathstring);
     if (ret != 2) {
-        strcpy(internal_dataparser->path, pathstring);
+        internal_dataparser->path = pathstring;
     } else {
         internal_dataparser->path = 0;
     }
@@ -97,6 +98,7 @@ char* uriparser_get_params(struct internal_dataparser *internal_dataparser, char
         } 
     }
     return 0;
+
     // printf("%s\n", internal_dataparser->datastore_session[1].key);
 }
 
