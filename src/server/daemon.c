@@ -82,7 +82,7 @@ void *thread_runner(void *data)
     struct container_data2thread *container_data2thread = (struct container_data2thread*)data;
     int free_num = container_data2thread->free_num;
 
-    char buf[8192];
+    char buf[16384];
    
     read(container_data2thread->multithreading_struct[free_num].fd_from_accept, buf, sizeof(buf));
 

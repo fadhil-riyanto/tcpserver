@@ -19,7 +19,7 @@ void http_too_many_requests(int fd_for_write)
                     "<br><br>"
                     "request detail: %s"
                     "<hr>"
-                    "<center>./tcpserver at pid %d\n", buf, getpid());
+                    "<center>made by integral2@fadhil_riyanto ran on gdb at pid %d with handler func conn_to_handle func\n", buf, getpid());
 
     write(fd_for_write, tempbuf, strlen(tempbuf));
 }

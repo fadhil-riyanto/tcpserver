@@ -23,6 +23,6 @@ void urlparser_parse(struct internal_dataparser *internal_dataparser, char *text
 char* uriparser_get_params(struct internal_dataparser *internal_dataparser, char* key);
 char* uriparser_get_path(struct internal_dataparser *internal_dataparser); // return path of request
 void urlparser_cleanup(struct internal_dataparser *internal_dataparser);
-
+char* urlparser_stringfy(struct internal_dataparser *internal_dataparser);
 
 #endif

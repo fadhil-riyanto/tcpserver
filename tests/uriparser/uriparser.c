@@ -7,7 +7,7 @@
 
 void internal_urlparser(struct internal_dataparser *internal_dataparser)
 {
-    char pathstring[200];
+    static char pathstring[200];
     char paramsstring[200];
     char paramsraw[200];
     char key[200];
@@ -15,9 +15,12 @@ void internal_urlparser(struct internal_dataparser *internal_dataparser)
     int ret, ret2;
     struct datastore_session *ret_realloc;
 
+    
+
     ret = split('?', internal_dataparser->source, internal_dataparser->length, 0, pathstring);
     if (ret != 2) {
-        strcpy(internal_dataparser->path, pathstring);
+        internal_dataparser->path = pathstring;
+        // strcpy(internal_dataparser->path, pathstring);
     } else {
         internal_dataparser->path = 0;
     }

@@ -26,7 +26,7 @@ void conn_to_handle(int fd_for_write, struct sockaddr_in *sockaddr_in, char *dat
                     "<h5>your request path</h5> : %s"
                     "<br><br><br>http parameter: %s"
                     "<hr>"
-                    "<center>made by integral2@fadhil_riyanto. run on gdb at pid %d with handler func conn_to_handle\n", http_parse_result.URI, urlparser_stringfy(&internal_dataparser), getpid());
+                    "<center>made by integral2@fadhil_riyanto. run on gdb at pid %d with handler func conn_to_handle\n", uriparser_get_path(&internal_dataparser), urlparser_stringfy(&internal_dataparser), getpid());
 
     write(fd_for_write, tempbuf, strlen(tempbuf));
 
